@@ -4,6 +4,7 @@ const uniqueValidator = require('mongoose-unique-validator');
 
 //Definimos el equema de nuestra localización
 let ammoSchema = new Schema({
+    id: {type: String},
     name: {
         type: String,
         required: true,

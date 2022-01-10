@@ -3,6 +3,7 @@ const router = express.Router();
 const gameSchema = require("../models/games.model");
 const authorize = require("../utils/middlewares/auth.middleware");
 const characterSchema = require ("../models/character.model");
+let charactersId;
 
 
 // Get All Games
@@ -30,60 +31,23 @@ router.route('/games/:id').get(authorize, (req, res, next) => {
 })
 
 // Get All characters of a game
-router.route('/games/:id/characters').get(/* authorize, */ (req, res, next) => {
-    
-    const gameId=req.params.id;
-/* gameSchema.findById(gameId).populate("characters")
-   .then((game) => {
-        var respuesta = res.json(game.characters);
+router.route('/games/:id/characters').get(/* authorize, */(req, res, next) => {
+    const gameId = req.params.id;
 
-        return respuesta
-   })
-
-*/
-
-
-/*  gameSchema.findById(gameId).populate("characters")
-    .then((game) => {
-            
-
-            for (let personaje of game.characters){            
-                characterSchema.findById(personaje)
-
-                .then((personajes) => {
-                    return res.json(personajes)
-                })
-
-            }
-
-    })     */  
-
-    gameSchema.findById(gameId)
-    .then((game) => {
-            
-
-            for (let personaje of game.characters){            
-                characterSchema.findById(personaje)
-
-                .then((personajes) => {
-                    var personajillos = []
-                    personajillos.push(res.json(personajes))
-                
-                })
-            
-            }
-            return res.json(personajillos)
-    })    
-
-
-
-.catch((error) => {
-       const errorHappened = new Error();
-       return next (errorHappened.message);
-
-   })
-});
-
-
+    gameSchema.findById(gameId).populate("characters")
+        .then((game) => {
+            charactersId = game.characters;
+        })
+        
+        .then(async () => {
+            const characters = await characterSchema.find({ _id: charactersId.map(i => i) })
+            return res.json(characters);
+        })
+        
+        .catch((error) => {
+            const errorHappened = new Error();
+            return next(errorHappened.message);
+        })
+})
 
 module.exports = router;

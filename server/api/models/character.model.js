@@ -5,6 +5,7 @@ const Game = require('./games.model');
 
 //Definimos el equema de nuestra localización
 let characterSchema = new Schema({
+    id: {type: String},
     name: {
         type: String,
         required: true,

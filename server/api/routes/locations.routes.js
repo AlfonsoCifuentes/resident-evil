@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const locationSchema = require("../models/locations.model");
 const authorize = require("../utils/middlewares/auth.middleware");
-
+const gameSchema = require ("../models/games.model")
+let gamesId;
 
 // Get All locations
 router.route('/locations').get(authorize, (req, res, next) => {
@@ -27,5 +28,26 @@ router.route('/locations/:id').get(authorize, (req, res, next) => {
         }
     })
 })
+
+// Get All games of a location
+router.route('/locations/:id/games').get(/* authorize, */(req, res, next) => {
+    const locationId = req.params.id;
+
+locationSchema.findById(locationId).populate("games")
+        .then((location) => {
+            gamesId = location.games;
+        })
+        
+        .then(async () => {
+            const games = await gameSchema.find({ _id: gamesId.map(i => i) })
+            return res.json(games);
+        })
+        
+        .catch((error) => {
+            const errorHappened = new Error();
+            return next(errorHappened.message);
+        })
+})
+
 
 module.exports = router;
